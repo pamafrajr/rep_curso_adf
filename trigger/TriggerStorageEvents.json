@@ -1,0 +1,26 @@
+{
+	"name": "TriggerStorageEvents",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pipelineTriggerEvents",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/csvfiles/blobs/cidadesTrigger",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/bfd655bc-0b8a-4695-ab6b-311e7c4d2d39/resourceGroups/rg-curso-udemy/providers/Microsoft.Storage/storageAccounts/dlscursoudemypedrodl",
+			"events": [
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
+			]
+		}
+	}
+}
