@@ -1,8 +1,8 @@
 {
-	"name": "TriggerTumblingWindow",
+	"name": "TriggerTumbling",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "pipelineTrigger",
@@ -19,11 +19,7 @@
 			"retryPolicy": {
 				"intervalInSeconds": 30
 			},
-			"dependsOn": [
-				{
-					"type": "SelfDependencyTumblingWindowTriggerReference"
-				}
-			]
+			"dependsOn": []
 		}
 	}
 }
