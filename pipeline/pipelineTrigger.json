@@ -1,0 +1,20 @@
+{
+	"name": "pipelineTrigger",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait_Trigger",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
+		"folder": {
+			"name": "adf_05_triggers"
+		},
+		"annotations": []
+	}
+}
