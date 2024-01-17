@@ -1,0 +1,7 @@
+{
+	"name": "iradfexterno",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "Integration Runtimes para fontes externas"
+	}
+}
