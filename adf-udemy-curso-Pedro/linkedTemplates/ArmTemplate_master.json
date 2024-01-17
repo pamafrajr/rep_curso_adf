@@ -19,6 +19,10 @@
 			"type": "string",
 			"defaultValue": "https://dlscursoudemypedrodl.dfs.core.windows.net/"
 		},
+		"TriggerStorageEvents_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/bfd655bc-0b8a-4695-ab6b-311e7c4d2d39/resourceGroups/rg-curso-udemy/providers/Microsoft.Storage/storageAccounts/dlscursoudemypedrodl"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -54,6 +58,9 @@
 					},
 					"ls_datalake_properties_typeProperties_url": {
 						"value": "[parameters('ls_datalake_properties_typeProperties_url')]"
+					},
+					"TriggerStorageEvents_properties_typeProperties_scope": {
+						"value": "[parameters('TriggerStorageEvents_properties_typeProperties_scope')]"
 					}
 				}
 			},

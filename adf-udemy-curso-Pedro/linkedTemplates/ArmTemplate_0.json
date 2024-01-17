@@ -18,6 +18,10 @@
 		"ls_datalake_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dlscursoudemypedrodl.dfs.core.windows.net/"
+		},
+		"TriggerStorageEvents_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/bfd655bc-0b8a-4695-ab6b-311e7c4d2d39/resourceGroups/rg-curso-udemy/providers/Microsoft.Storage/storageAccounts/dlscursoudemypedrodl"
 		}
 	},
 	"variables": {
@@ -101,6 +105,32 @@
 				"activities": [
 					{
 						"name": "Wait_Trigger",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "adf_05_triggers"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipelineTriggerEvents')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait_TriggerEvents",
 						"type": "Wait",
 						"dependsOn": [],
 						"userProperties": [],
@@ -648,7 +678,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipeline": {
 					"pipelineReference": {
 						"referenceName": "pipelineTrigger",
@@ -671,6 +701,38 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pipelineTrigger')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TriggerStorageEvents')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pipelineTriggerEvents",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/csvfiles/blobs/cidadesTrigger",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('TriggerStorageEvents_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipelineTriggerEvents')]"
 			]
 		},
 		{
@@ -876,430 +938,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dataset_excel_fixo')]",
 				"[concat(variables('factoryId'), '/datasets/dataset_generico_csv')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipe_filter')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "metadados",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "dataset_generico_csv",
-								"type": "DatasetReference",
-								"parameters": {
-									"containerName": "csvfiles",
-									"fileName": "*.csv",
-									"separatorName": ";"
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "Lookup_csv",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "dataset_generico_csv",
-								"type": "DatasetReference",
-								"parameters": {
-									"containerName": "csvfiles",
-									"fileName": "csvCor.csv",
-									"separatorName": ";"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Filter_getmetadata",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "metadados",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('metadados').output.childItems",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@startswith(item().name, 'C')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Lookup_sql",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dataset_dinamico_azuresql",
-								"type": "DatasetReference",
-								"parameters": {
-									"schemaName": "SalesLT",
-									"tableName": "ProductCategory"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Filter_lookup_csv",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup_csv",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup_csv').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@not(contains(item().Cor,'azul'))",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Filter_Lookup_sql",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup_sql",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup_sql').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@contains(item().Name,'Bike')",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "adf_02_activies"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-01-09T01:20:13Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/dataset_generico_csv')]",
-				"[concat(variables('factoryId'), '/datasets/dataset_dinamico_azuresql')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipe_forEach')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "metadados",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "dataset_generico_csv",
-								"type": "DatasetReference",
-								"parameters": {
-									"containerName": "csvfiles",
-									"fileName": "*.csv",
-									"separatorName": ";"
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "ForEach_getmetadata",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "metadados",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('metadados').output.childItems",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "loop_01",
-									"type": "Wait",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"waitTimeInSeconds": 1
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Lookup_sql",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dataset_dinamico_azuresql",
-								"type": "DatasetReference",
-								"parameters": {
-									"schemaName": "SalesLT",
-									"tableName": "ProductCategory"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Filter_Lookup_sql",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup_sql",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup_sql').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@contains(item().Name,'Bike')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "ForEach_filter",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Filter_Lookup_sql",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Filter_Lookup_sql').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "loop_02",
-									"type": "Wait",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"waitTimeInSeconds": 1
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Lookup_csv",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "dataset_generico_csv",
-								"type": "DatasetReference",
-								"parameters": {
-									"containerName": "csvfiles",
-									"fileName": "csvCor.csv",
-									"separatorName": ";"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach_lookup",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup_csv",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup_csv').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "loop_03",
-									"type": "Wait",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"waitTimeInSeconds": 1
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "adf_02_activies"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-01-09T01:29:37Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/dataset_generico_csv')]",
-				"[concat(variables('factoryId'), '/datasets/dataset_dinamico_azuresql')]"
 			]
 		}
 	]

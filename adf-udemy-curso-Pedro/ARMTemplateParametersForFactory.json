@@ -13,6 +13,9 @@
 		},
 		"ls_datalake_properties_typeProperties_url": {
 			"value": "https://dlscursoudemypedrodl.dfs.core.windows.net/"
+		},
+		"TriggerStorageEvents_properties_typeProperties_scope": {
+			"value": "/subscriptions/bfd655bc-0b8a-4695-ab6b-311e7c4d2d39/resourceGroups/rg-curso-udemy/providers/Microsoft.Storage/storageAccounts/dlscursoudemypedrodl"
 		}
 	}
 }
