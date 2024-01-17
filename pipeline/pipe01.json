@@ -1,0 +1,38 @@
+{
+	"name": "pipe01",
+	"properties": {
+		"activities": [
+			{
+				"name": "Aguardar3seg",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 3
+				}
+			},
+			{
+				"name": "Aguardar4seg",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Aguardar3seg",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 4
+				}
+			}
+		],
+		"folder": {
+			"name": "adf_01_pipeline01"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-01-08T23:46:12Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
