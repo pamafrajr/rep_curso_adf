@@ -1,0 +1,20 @@
+{
+	"name": "pipelineGitHub",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait_GitHub",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
+		"folder": {
+			"name": "adf_04_git"
+		},
+		"annotations": []
+	}
+}
