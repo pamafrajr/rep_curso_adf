@@ -1,0 +1,9 @@
+{
+	"name": "adf-udemy-curso-Pedro",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d86c00e2-8bbf-445a-a9fb-46e6c44d4369",
+		"tenantId": "75d670a3-cf93-499b-a1b4-dea57d36df61"
+	}
+}
